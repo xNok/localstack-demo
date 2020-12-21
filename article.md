@@ -29,9 +29,7 @@ First, we'll need to install a few things.
 
 1. Install [Docker](https://docs.docker.com/install/) if you haven't already.
 2. Install the [AWS CLI](https://aws.amazon.com/cli/). Even though we aren't going to be working with "real" AWS, we'll use this to talk to our local docker containers.
-3. Make a few files. Create a new directory for your project, and within it: `touch index.js docker-compose.yml .env && mkdir .localstack`
 4. Add an image to your project directory and rename it to `test-upload.jpg`
-5. `npm init` to set up a package.json, then `npm install aws-sdk dotenv`
 
 ## Docker
 
@@ -42,25 +40,8 @@ First, we'll need to install a few things.
 
 You can run Localstack directly from the command line, but I like using Docker because it makes me feel smart. It's also nice because you don't need to worry about installing Localstack on your system. I prefer to use docker-compose to set this up. Here's the config:
 
-`docker-compose.yml` 
+[docker-compose.yml](docker-compose.yml)
 
-```
-version: '3.2'
-services:
-  localstack:
-    image: localstack/localstack:latest
-    container_name: localstack_demo
-    ports:
-      - '4563-4584:4563-4584'
-      - '8055:8080'
-    environment:
-      - SERVICES=s3
-      - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
-    volumes:
-      - './.localstack:/tmp/localstack'
-      - '/var/run/docker.sock:/var/run/docker.sock'
-```
 
 Breaking some of these lines down:
 
@@ -72,7 +53,6 @@ Use the latest [Localstack image from Dockerhub](https://hub.docker.com/r/locals
 #### `container_name: localstack_demo`:
 
 This gives our container a specific name that we can refer to later in the CLI.
-
 
 #### `ports: '4563-4584:4563-4584'` and `'8055:8080'`:
 
@@ -124,7 +104,7 @@ AWS is now inside our computer. You might already be feeling a little bit like y
 
 Before we start uploading files, we need to create and configure a bucket. We'll do this using the AWS CLI that we installed earlier, using the `--endpoint-url` flag to talk to Localstack instead.
 
-1. Create a bucket: `aws --endpoint-url=http://localhost:4572 s3 mb s3://demo-bucket`
+1. Create a bucket: `aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-bucket`
 2. Attach an [ACL](https://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html) to the bucket so it is readable: `aws --endpoint-url=http://localhost:4572 s3api put-bucket-acl --bucket demo-bucket --acl public-read`
 
 Now, when we visit the web UI, we will see our bucket:
