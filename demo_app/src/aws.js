@@ -1,17 +1,17 @@
 require('dotenv').config()
 
-// Require AWS Node.js SDK
+// // Require AWS Node.js SDK
 const AWS = require('aws-sdk')
-// Require logplease
-const logplease = require('logplease');
-// Set external log file option
-logplease.setLogfile('debug.log');
-// Set log level
-logplease.setLogLevel('DEBUG');
-// Create logger
-const logger = logplease.create('logger name');
-// Assign logger to SDK
-AWS.config.logger = logger;
+// // Require logplease
+// const logplease = require('logplease');
+// // Set external log file option
+// logplease.setLogfile('debug.log');
+// // Set log level
+// logplease.setLogLevel('DEBUG');
+// // Create logger
+// const logger = logplease.create('logger name');
+// // Assign logger to SDK
+// AWS.config.logger = logger;
 
 const credentials = {
    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -19,7 +19,7 @@ const credentials = {
 }
 
 const bucketName = process.env.AWS_S3_BUCKET_NAME
-const endpoint    = process.env.LOCALSTACK_ENDPOINT
+const endpoint   = process.env.LOCALSTACK_ENDPOINT
 
 const s3client = new AWS.S3({
    credentials,
