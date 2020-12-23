@@ -4,15 +4,16 @@ services:
   demo_app:
     build: demo_app
     environment: 
-      LOCALSTACK_HOST: http://localstack_main:4566/
+      LOCALSTACK_ENDPOINT: http://localstack:4566/
     volumes:
     - "./demo_app/src/:/root/chat/src/"
     depends_on:
     - "localstack"
+    links:
+    - "localstack"
   localstack:
-    container_name: "${LOCALSTACK_DOCKER_NAME-localstack_main}"
     image: localstack/localstack
-    network_mode: bridge
+    container_name: localstack
     ports:
       - "4566:4566"
       - "4571:4571"

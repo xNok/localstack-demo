@@ -1,8 +1,8 @@
 #
 # ---- Base Node ----
-FROM alpine:3.5 AS base
+FROM alpine:3 AS base
 # install node
-RUN apk add --no-cache nodejs-current tini
+RUN apk update && apk add --no-cache nodejs-current npm tini
 # set working directory
 WORKDIR /root/chat
 # Set tini as entrypoint

@@ -1,5 +1,17 @@
-const S3 = require('aws-sdk/clients/s3')
 require('dotenv').config()
+
+// Require AWS Node.js SDK
+const AWS = require('aws-sdk')
+// Require logplease
+const logplease = require('logplease');
+// Set external log file option
+logplease.setLogfile('debug.log');
+// Set log level
+logplease.setLogLevel('DEBUG');
+// Create logger
+const logger = logplease.create('logger name');
+// Assign logger to SDK
+AWS.config.logger = logger;
 
 const credentials = {
    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -7,18 +19,29 @@ const credentials = {
 }
 
 const bucketName = process.env.AWS_S3_BUCKET_NAME
-const hostUrl    = process.env.LOCALSTACK_HOST
+const endpoint    = process.env.LOCALSTACK_ENDPOINT
 
-const s3client = new S3({
+const s3client = new AWS.S3({
    credentials,
    /**
     * When working locally, we'll use the Localstack endpoints. This is the one for S3.
     * A full list of endpoints for each service can be found in the Localstack docs.
     */
-   endpoint: hostUrl
+   endpoint: endpoint,
+   sslEnabled: false,
+   s3ForcePathStyle: true
 })
 
-function createBucket(){
+/* For Testing purpose */
+var request = function(operation, params) {
+   return s3client.makeRequest(operation, params);
+};
+
+var build = function(operation, params) {
+   return request(operation, params).build().httpRequest;
+};
+
+function createBucket() {
    var params = {
       Bucket: bucketName, /* required */
       ACL: private | public-read | public-read-write | authenticated-read,
@@ -39,20 +62,22 @@ function createBucket(){
     });
 }
 
-function uploadFile(data, name) {
-   console.log(`host: ${hostUrl}, bucket: ${bucketName}`)
+async function uploadFile(data, filename) {
+   uploadConfig = {
+      Bucket: bucketName,
+      Key: `${filename}`,
+      Body: data,
+      ContentType: "image/jpg",
+      ACL: 'public-read',
+   }
 
-   return new Promise((resolve, reject) => {
-      s3client.upload(
-         {
-            Bucket: bucketName,
-            /*
-               include the bucket name here. For some reason Localstack needs it.
-               see: https://github.com/localstack/localstack/issues/1180
-            */
-            Key: `${bucketName}/${name}`,
-            Body: data,
-         },
+   // var req = build('headObject', uploadConfig);
+   // console.log(`DEBUG / hostname: ${req.endpoint.hostname}, path: ${req.path}`)
+
+   console.log(`host: ${endpoint}, bucket: ${bucketName}`)
+
+   return await new Promise((resolve, reject) => {
+      s3client.upload(uploadConfig,
          (err, response) => {
             if (err)
                reject(err)
